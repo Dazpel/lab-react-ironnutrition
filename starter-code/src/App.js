@@ -3,6 +3,7 @@ import './App.css';
 import { FoodBox } from './FoodBox';
 import foods from './foods.json';
 import 'bulma/css/bulma.css';
+import AddFood from './AddFood';
 
 class App extends Component {
   state = {
@@ -17,14 +18,49 @@ class App extends Component {
     this.setState({ [e.target.name]: e.target.value });
   };
 
-  updateFood = (e) => {
-    let totalC = e.quantity * e.calories;
-    this.setState({ totalCalories: this.state.totalCalories + totalC });
-    this.setState({ todayFood: this.state.todayFood.concat(e) });
+  updateFood = (e, index, item) => {
+    let foodItem = {
+      ...this.state.foodList[index],
+      quantity: Number(e.target.value),
+    };
+
+    let copyOfFoods = [...this.state.foodList];
+
+    copyOfFoods.splice(index, 1, foodItem);
+    this.setState({
+      foodList: copyOfFoods,
+    });
+  };
+
+  updateTodayFoods = (index, item) => {
+    let todayFood = [...this.state.todayFood];
+    let calories = 0;
+
+    if (typeof todayFood[index] === 'undefined') {
+      todayFood[index] = item;
+      calories = item.quantity * item.calories;
+    } else {
+      todayFood[index].quantity = item.quantity + todayFood[index].quantity;
+      calories = item.quantity * item.calories;
+    }
+
+    this.setState({
+      todayFood: todayFood,
+      totalCalories: this.state.totalCalories + calories,
+    });
+  };
+
+  addFood = (e) => {
+    this.setState({ foodList: this.state.foodList.concat(e) });
   };
 
   render() {
-    const { foodList, searchBar, todayFood, totalCalories } = this.state;
+    const {
+      foodList,
+      searchBar,
+      todayFood,
+      totalCalories,
+    } = this.state;
     const filteredFood = foodList.filter((food) =>
       food.name.toLowerCase().includes(searchBar.toLowerCase())
     );
@@ -40,23 +76,34 @@ class App extends Component {
             placeholder="Find food.."
           />
         </div>
+
+        <AddFood addFood={this.addFood} />
+
         <div className="columns">
           <div className="column">
-            <FoodBox food={filteredFood} updateFood={this.updateFood} />
+            <FoodBox
+              food={filteredFood}
+              updateFood={this.updateFood}
+              updateTodayFoods={this.updateTodayFoods}
+            />
           </div>
           <div className="column">
             <h4 className="subtitle is-4">Today's Food</h4>
             <ul>
-              {todayFood.map((food, i) => {
-                let cal = food.quantity * food.calories;
-                return (
-                  <li key={i}>
-                    {food.quantity}x {food.name} = {cal} calories
-                  </li>
-                );
+              {todayFood.map((item, i) => {
+                if (typeof item === 'undefined') {
+                  return console.log('do nothing');
+                } else {
+                  let cal = item.quantity * item.calories;
+                  return (
+                    <li key={i}>
+                      {item.quantity}x {item.name} = {cal} calories
+                    </li>
+                  );
+                }
               })}
             </ul>
-            <p>Total: {totalCalories} calories</p>
+            <p>Total: <strong>{totalCalories} calories</strong></p>
           </div>
         </div>
       </div>

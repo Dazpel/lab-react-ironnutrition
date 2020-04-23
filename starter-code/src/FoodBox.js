@@ -1,13 +1,8 @@
 import React from 'react';
 import 'bulma/css/bulma.css';
 
-export const FoodBox = ({ food, updateFood }) => {
-  const updateFoods = (e, i) => {
-    let x = document.getElementById('quantity' + i).value;
-    e.quantity = x;
-    updateFood(e);
-  };
-
+export const FoodBox = ({ food, updateFood, updateTodayFoods }) => {
+ 
   console.log();
   return food.map((item, i) => (
     <div className="box" key={i}>
@@ -21,19 +16,23 @@ export const FoodBox = ({ food, updateFood }) => {
           <div className="content">
             <p>
               <strong>{item.name}</strong> <br />
-              <small>{item.calories}</small>
+              <small>{item.calories} cal</small>
             </p>
           </div>
         </div>
         <div className="media-right">
           <div className="field has-addons">
             <div className="control">
-              <input id={`quantity${i}`} className="input" type="number" />
+              <input min="1" className="input" type="number" value={item.quantity} onChange={(event) =>
+                  updateFood(event, i,item)
+                }/>
             </div>
             <div className="control">
               <button
                 className="button is-info"
-                onClick={() => updateFoods(item, i)}
+                onClick={() =>
+                  updateTodayFoods(i,item)
+                }
               >
                 +
               </button>

@@ -10,3 +10,11 @@
 }
 
 
+.modal-content {
+  background-color: whitesmoke;
+  padding: 20px;
+}
+
+button{
+  margin: 10px 10px 10px 0 !important;
+}
